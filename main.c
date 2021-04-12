@@ -38,21 +38,24 @@ char* shuffle(char* in, int key, boolean encrypt) {
     int len=0;
     key=abs(key);
     do {
-     if (in[len]<'\0' || in[len]>'z') {
+     if (in[len]<'\0' || in[len]>('z'+1)) {
       printf("Message contains invalid characters\n");
       return NULL;
      }
      len++;
     } while (in[len]!='\0');
-   char* out=(char*) calloc(len,sizeof (char));
    int row=(int) len/key;
    int col_end=((len%key)>0 ? 1 :0);
+   char* out=(char*) calloc(((row+col_end)*key+1),sizeof (char));
    int x=0;
    for (int i=0;i<(row+col_end);i++) {
        x=i*key;
        for (int j=0;j<key;j++) {
-           if ((x+key-1-j)>(len-1))
-               out[x+j]=' ';//(char)(rand()%((int)'Z'-(int)'A')+(int)'A');
+           if ((!encrypt) && in[x+key-1-j]==(char) 123) break;
+           if ((x+key-1-j)>(len-1)) {
+            if ((x+key-1-j)==(len)) out[x+j]=(char) 123;
+            else out[x+j]=(char)(rand()%((int)'z'-(int)'0')+(int)'0');
+            }
            else out[x+j]=in[x+key-1-j];
        }
    }
@@ -64,8 +67,8 @@ int main()
 {
 // Task 1
    printf("Task 1\n");
-   char* phrase="A ROZA UPALA NA LAPU AZORA\0";
-   //char* phrase="Google is very best site!\0";
+   //char* phrase="A ROZA UPALA NA LAPU AZORA\0";
+   char* phrase="Google is very best site!!!\0";
    char* phraseCr=caesar(phrase, -34, true);
    char* phraseDecr=caesar(phraseCr, -34, false);
    if (phraseCr!=NULL) printf("%s\n", phraseCr);
